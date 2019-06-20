@@ -1336,7 +1336,7 @@ export class CockroachQueryRunner extends BaseQueryRunner implements QueryRunner
         }).join(" OR ");
 
         const constraintsSql = `SELECT "ns"."nspname" AS "table_schema", "t"."relname" AS "table_name", "cnst"."conname" AS "constraint_name", ` +
-            `CASE "cnst"."contype" WHEN 'x' THEN pg_get_constraintdef("cnst"."oid", true) ELSE "cnst"."consrc" END AS "expression", ` +
+            `CASE "cnst"."contype" WHEN 'c' THEN regexp_replace(pg_get_constraintdef("cnst"."oid", true), '^CHECK\\s*\\((.*)\\)\\s*$', '\\1', 'i') ELSE pg_get_constraintdef("cnst"."oid", true) END AS "expression", ` +
             `CASE "cnst"."contype" WHEN 'p' THEN 'PRIMARY' WHEN 'u' THEN 'UNIQUE' WHEN 'c' THEN 'CHECK' WHEN 'x' THEN 'EXCLUDE' END AS "constraint_type", "a"."attname" AS "column_name" ` +
             `FROM "pg_constraint" "cnst" ` +
             `INNER JOIN "pg_class" "t" ON "t"."oid" = "cnst"."conrelid" ` +
